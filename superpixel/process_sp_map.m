@@ -1,13 +1,29 @@
-% Explanation: process sp map to produce successive indices, [0:max_ind-1]
-% GCC, 2015-9-7
+% Fix bug brought by slic in vlfeat.
 
 function post_sp_map = process_sp_map(sp_map)
-	sp_ind = sort(unique(sp_map),'ascend');
-	ind_imagined = (0:max(max(sp_map)))';
-	post_sp_map = sp_map;
+    % Assign different labels for unconnected superpixels with the same index.
+    post_sp_map = sp_map;
+	[hig, wid] = size(sp_map);
+	[~, ~, ic] = unique(reshape(post_sp_map, hig*wid, 1)); 
+	post_sp_map = reshape(ic, hig, wid);
+	spNumber = max(post_sp_map(:));         
+	spCounter = 0;
+	for ii = 1:spNumber
+	    CC = bwconncomp(logical(post_sp_map == ii), 8);
+	    for u = 2:CC.NumObjects % If there is more than one component
+	        indexList = CC.PixelIdxList{u};
+	        spCounter = spCounter + 1;
+	        post_sp_map(indexList) = spNumber + spCounter; % Assign a new superpixel label
+	    end
+	end
+	post_sp_map = post_sp_map - 1; % Make sp_map begins from 0
+    
+    % Produce successive indices, ranging from 0 to max_ind - 1.
+    sp_ind = sort(unique(post_sp_map),'ascend');
+	ind_imagined = (0:max(max(post_sp_map)))';
 	if ~isequal(sp_ind,ind_imagined)
 		for i = 1:length(sp_ind)
-			post_sp_map(sp_map==sp_ind(i)) = i - 1;
+			post_sp_map(post_sp_map==sp_ind(i)) = i - 1;
 		end
 	end
 end

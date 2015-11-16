@@ -9,4 +9,5 @@
 *.dat
 
 # Unused files.
+test/
 SLIC_mex/
