@@ -1,0 +1,12 @@
+# Temp files.
+*.*~
+*.tmp
+
+# Cache
+.DS_Store
+
+# Data files.
+*.dat
+
+# Unused files.
+SLIC_mex/
