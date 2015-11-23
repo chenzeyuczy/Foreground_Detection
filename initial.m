@@ -1,7 +1,7 @@
 clear('all');
 
-addpath(genpath('vlfeat'));
 % Add CV library into path.
+addpath(genpath('vlfeat'));
 addpath('superpixel');
 
 dataset_path = '~/Documents/Lab/dataset/SegTrack_V1/';

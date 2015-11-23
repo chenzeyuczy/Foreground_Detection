@@ -11,6 +11,7 @@ function [dataset_info] = parse_segtrackv1(segtrack_root)
 	video_name = dir(segtrack_root);
 	video_name(1:2) = [];
     % Remove first two elements from array.
+    dataset_info = cell(length(video_name), 1);
 
 	for i = 1:length(video_name)
 		dataset_info{i}.data_name=video_name(i).name;
@@ -41,6 +42,7 @@ function [dataset_info] = parse_segtrackv1(segtrack_root)
 			gt_path = [video_root 'ground-truth/' gt_info(j).name];
 			dataset_info{i}.gt_name{j,1} = gt_info(j).name;
 			dataset_info{i}.gt{j,1} = imread(gt_path);
+			dataset_info{i}.gt{j,1} = im2bw(dataset_info{i}.gt{j});
 		end
 	end
 
