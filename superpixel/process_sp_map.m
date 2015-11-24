@@ -1,4 +1,4 @@
-% Fix bug brought by slic in vlfeat.
+% Fix bug brought by slic in vlfeat, integrated by chenzy.
 
 function post_sp_map = process_sp_map(sp_map)
     % Assign different labels for unconnected superpixels with the same index.
@@ -15,15 +15,14 @@ function post_sp_map = process_sp_map(sp_map)
 	        spCounter = spCounter + 1;
 	        post_sp_map(indexList) = spNumber + spCounter; % Assign a new superpixel label
 	    end
-	end
-	post_sp_map = post_sp_map - 1; % Make sp_map begins from 0
+    end
     
-    % Produce successive indices, ranging from 0 to max_ind - 1.
+    % Produce successive indices, ranging from 1 to max_ind.
     sp_ind = sort(unique(post_sp_map),'ascend');
 	ind_imagined = (0:max(max(post_sp_map)))';
 	if ~isequal(sp_ind,ind_imagined)
 		for i = 1:length(sp_ind)
-			post_sp_map(post_sp_map==sp_ind(i)) = i - 1;
+			post_sp_map(post_sp_map==sp_ind(i)) = i;
 		end
 	end
 end

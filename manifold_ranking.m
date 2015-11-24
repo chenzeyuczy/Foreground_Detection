@@ -41,4 +41,15 @@ function saliency_map = manifold_ranking(image, superpixel)
     saliency_map = saliency_top .* saliency_bottom .* saliency_left .* saliency_right;
     saliency_map = (saliency_map - min(saliency_map(:))) / (max(saliency_map(:)) - min(saliency_map(:)));
     
+    % Binarization upon saliency map.
+    threshold = mean(saliency_map(:));
+    query_binary = zeros(height, width);
+    query_binary(saliency_map >= threshold) = 1;
+    saliency_map = opt_aff * query_binary;
+    saliency_map = (saliency_map - min(saliency_map(:))) / (max(saliency_map(:)) - min(saliency_map(:)));
+    
+end
+
+function weight_matrix = construct_weight_matrix(image)
+    % TODO: I don't know how to explain.
 end

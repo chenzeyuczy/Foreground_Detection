@@ -10,4 +10,5 @@
 
 # Unused files.
 test/
-SLIC_mex/
+saliencymap/
+test.m
