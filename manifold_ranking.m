@@ -1,4 +1,9 @@
-% This is a script writen by czy.
+% Generate a saliency map using manifold ranking algorithm.
+% Input:
+%   input_im -- Image to be processed.
+%   opts -- Options for SLIC algorithm.
+% Output:
+%   saliency_map -- The saliency map for image, ranging from 0 to 1.
 
 function saliency_map = manifold_ranking(input_im, opts)
     %%---------------parameter initialization------------%%
