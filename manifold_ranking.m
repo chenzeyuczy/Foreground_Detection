@@ -1,55 +1,115 @@
 % This is a script writen by czy.
 
-function saliency_map = manifold_ranking(image, superpixel)
-    % Parameters initialization.
-    alpha = 0.99;
-    [height, width, ~] = size(image);
-    sp_num = max(superpixel(:));
+function saliency_map = manifold_ranking(input_im, opts)
+    %%---------------parameter initialization------------%%
+    theta = 10; % control the edge weight 
+    alpha = 0.99; % control the balance of two items in manifold ranking cost function
+    saldir = './saliencymap/'; % the output path of the saliency map
+    [m, n, k] = size(input_im);
     
-    % Transform color space.
-    lab_image = rgb2lab(image);
-    
-    % Construct related matrix.
-    % Still a long way to go.
-    weight_matrix = construct_weight_matrix(lab_image);
-    degree_matrix = sparse(1:sp_num, 1:spnum, sum(weight_matrix));
-    
-    opt_aff = (degree_matrix - alpha * weight_matrix) \ eye(sp_num);
-    opt_aff = opt_aff * (~diag(ones(sp_num, 1)));
-    
-    % Query from four boundaries.
-    query_top = zeros(sp_num, 1);
-    query_top(unique(superpixel(1, 1:width))) = 1;
-    saliency_top = opt_aff * query_top;
-    saliency_top = 1 - (saliency_top - min(saliency_top(:))) / (max(saliency_top(:)) - min(saliency_top(:)));
-    
-    query_bottom = zeros(sp_num, 1);
-    query_bottom(unique(superpixel(height, 1:width))) = 1;
-    saliency_bottom = opt_aff * query_bottom;
-    saliency_bottom = 1 - (saliency_bottom - min(saliency_bottom(:))) / (max(saliency_bottom(:)) - min(saliency_bottom(:)));
-    
-    query_left = zeros(sp_num, 1);
-    query_left(unique(superpixel(1:height, 1))) = 1;
-    saliency_left = opt_aff * query_left;
-    saliency_left = 1 - (saliency_left - min(saliency_left(:))) / (max(saliency_left(:)) - min(saliency_left(:)));
-    
-    query_right = zeros(sp_num, 1);
-    query_right(unique(superpixel(1:height, width))) = 1;
-    saliency_right = opt_aff * query_right;
-    saliency_right = 1 - (saliency_right - min(saliency_right(:))) / (max(saliency_right(:)) - min(saliency_right(:)));
-    
-    saliency_map = saliency_top .* saliency_bottom .* saliency_left .* saliency_right;
-    saliency_map = (saliency_map - min(saliency_map(:))) / (max(saliency_map(:)) - min(saliency_map(:)));
-    
-    % Binarization upon saliency map.
-    threshold = mean(saliency_map(:));
-    query_binary = zeros(height, width);
-    query_binary(saliency_map >= threshold) = 1;
-    saliency_map = opt_aff * query_binary;
-    saliency_map = (saliency_map - min(saliency_map(:))) / (max(saliency_map(:)) - min(saliency_map(:)));
-    
-end
+    if exist(saldir, 'dir') ~= 7
+        mkdir(saldir);
+    end
 
-function weight_matrix = construct_weight_matrix(image)
-    % TODO: I don't know how to explain.
+    %%----------------------generate superpixels--------------------%%
+    superpixels = process_sp_map(gen_sp(input_im, opts));
+    spnum = max(superpixels(:)); % the actual superpixel number
+
+    %%----------------------design the graph model--------------------------%%
+    % compute the feature (mean color in lab color space) 
+    % for each node (superpixels)
+    input_vals = reshape(input_im, m*n, k);
+    rgb_vals = zeros(spnum,1,3);
+    inds = cell(spnum, 1);
+    for i = 1:spnum
+        inds{i} = find(superpixels==i);
+        rgb_vals(i,1,:) = mean(input_vals(inds{i},:),1);
+    end
+    lab_vals = colorspace('Lab<-', rgb_vals);
+    seg_vals = reshape(lab_vals, spnum, 3); % feature for each superpixel
+ 
+    % get edges
+    adjloop = AdjcProcloop(superpixels, spnum);
+    edges = [];
+    for i = 1:spnum
+        indext = [];
+        ind = find(adjloop(i,:)==1);
+        for j = 1:length(ind)
+            indj = find(adjloop(ind(j),:)==1);
+            indext = [indext,indj];
+        end
+        indext = [indext,ind];
+        indext = indext((indext>i));
+        indext = unique(indext);
+        if (~isempty(indext))
+            ed = ones(length(indext),2);
+            ed(:,2) = i;
+            ed(:,1) = indext;
+            edges = [edges;ed];
+        end
+    end
+
+    % compute affinity matrix
+    weights = makeweights(edges,seg_vals,theta);
+    W = adjacency(edges,weights,spnum);
+
+    % learn the optimal affinity matrix (eq. 3 in paper)
+    D = sparse(1:spnum,1:spnum,sum(W));
+    optAff = (D-alpha*W)\eye(spnum);
+    optAff = optAff.*(~diag(ones(spnum,1)));
+  
+    %%-----------------------------stage 1--------------------------%%
+    % compute the saliency value for each superpixel 
+    % with the top boundary as the query
+    Yt = zeros(spnum,1);
+    Yt(unique(superpixels(1,1:n))) = 1;
+    bsalt = optAff*Yt;
+    bsalt = (bsalt-min(bsalt(:)))/(max(bsalt(:))-min(bsalt(:)));
+    bsalt = 1-bsalt;
+
+    % down
+    Yd = zeros(spnum,1);
+    Yd(unique(superpixels(m,1:n))) = 1;
+    bsald = optAff*Yd;
+    bsald = (bsald-min(bsald(:)))/(max(bsald(:))-min(bsald(:)));
+    bsald = 1-bsald;
+   
+    % right
+    Yr = zeros(spnum,1);
+    Yr(unique(superpixels(1:m,1))) = 1;
+    bsalr = optAff*Yr;
+    bsalr = (bsalr-min(bsalr(:)))/(max(bsalr(:))-min(bsalr(:)));
+    bsalr = 1-bsalr;
+  
+    % left
+    Yl = zeros(spnum,1);
+    Yl(unique(superpixels(1:m,n))) = 1;
+    bsall = optAff*Yl;
+    bsall = (bsall-min(bsall(:)))/(max(bsall(:))-min(bsall(:)));
+    bsall = 1-bsall;   
+   
+    % combine 
+    bsalc = (bsalt.*bsald.*bsall.*bsalr);
+    bsalc = (bsalc-min(bsalc(:)))/(max(bsalc(:))-min(bsalc(:)));
+
+    %%----------------------stage2-------------------------%%
+    % binary with an adaptive threhold (i.e. mean of the saliency map)
+    th = mean(bsalc);
+    bsalc(bsalc<th) = 0;
+    bsalc(bsalc>=th) = 1;
+    
+    % compute the saliency value for each superpixel
+    fsal = optAff*bsalc;    
+    
+    % assign the saliency value to each pixel
+    tmap = zeros(m,n);
+    for i = 1:spnum
+        tmap(inds{i}) = fsal(i);    
+    end
+    tmap = (tmap-min(tmap(:)))/(max(tmap(:))-min(tmap(:)));
+
+    saliency_map = zeros(m,n);
+    saliency_map(1:m,1:n) = tmap;
+    saliency_map = uint8(saliency_map*255);
+    
 end

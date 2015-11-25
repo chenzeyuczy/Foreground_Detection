@@ -6,8 +6,7 @@
 %%------------------------set parameters---------------------%%
 theta = 10; % control the edge weight 
 alpha = 0.99; % control the balance of two items in manifold ranking cost function
-spnumber = 200; % superpixel number
-imgRoot = '../../dataset/SegTrack_V1/cheetah/'; % test image path
+imgRoot = '../../dataset/SegTrack_V1/girl/'; % test image path
 saldir = './saliencymap/'; % the output path of the saliency map
 mkdir(saldir);
 imnames = dir([imgRoot '*' 'bmp']);
@@ -50,7 +49,7 @@ for ii = 1:length(imnames)
         indext = unique(indext);
         if (~isempty(indext))
             ed = ones(length(indext),2);
-            ed(:,2) = i*ed(:,2);
+            ed(:,2) = i;
             ed(:,1) = indext;
             edges = [edges;ed];
         end
