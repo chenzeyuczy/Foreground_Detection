@@ -1,9 +1,9 @@
 % Generate a saliency map using manifold ranking algorithm.
-% Input:
-%   input_im -- Image to be processed.
-%   opts -- Options for SLIC algorithm.
+% Input
+%   - input_im: Image to be processed.
+%   - opts: Options for SLIC algorithm.
 % Output:
-%   saliency_map -- The saliency map for image, ranging from 0 to 1.
+%   - saliency_map: The saliency map for image, ranging from 0 to 1.
 
 function saliency_map = manifold_ranking(input_im, opts)
     %%---------------parameter initialization------------%%
@@ -115,6 +115,5 @@ function saliency_map = manifold_ranking(input_im, opts)
 
     saliency_map = zeros(m,n);
     saliency_map(1:m,1:n) = tmap;
-    saliency_map = uint8(saliency_map*255);
     
 end
