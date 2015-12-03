@@ -1,0 +1,64 @@
+% Function to generate object proposal from image,
+% using Geodestic Object Proposal Algorithm(GOP).
+% Writen by chenzy.
+% Input
+%     - imagePath: Path of the image to be processed.
+%     - maxPropNum: Maximum number of object proposals to return, set as
+%     size of proposal by default.
+%     - showProp: Option to determine whether to show proposals or not.
+% Output
+%     - masks: Cell array which store proposal info within a image.
+
+
+function masks = get_gop(imagePath, maxPropNum, showProp)
+    % ---Initialization---
+    
+    % Set a boundary detector by calling (before creating an OverSegmentation!):
+    % gop_mex( 'setDetector', 'SketchTokens("./data/st_full_c.dat")' );
+    % gop_mex( 'setDetector', 'StructuredForest("./data/sf.dat")' );
+    gop_mex( 'setDetector', 'MultiScaleStructuredForest("./data/sf.dat")' );
+
+    % Setup the proposal pipeline (baseline)
+    p = Proposal('max_iou', 0.8,...
+                 'unary', 130, 5, 'seedUnary()', 'backgroundUnary({0,15})',...
+                 'unary', 130, 1, 'seedUnary()', 'backgroundUnary({})', 0, 0, ... % Seed Proposals (v1.2 and newer)
+                 'unary', 0, 5, 'zeroUnary()', 'backgroundUnary({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15})' ...
+                 );
+    % Setup the proposal pipeline (learned)
+    % p = Proposal('max_iou', 0.8,...
+    %              'seed', './data/seed_final.dat',...
+    %              'unary', 140, 4, 'binaryLearnedUnary("./data/masks_final_0_fg.dat")', 'binaryLearnedUnary("./data/masks_final_0_bg.dat"',...
+    %              'unary', 140, 4, 'binaryLearnedUnary("./data/masks_final_1_fg.dat")', 'binaryLearnedUnary("./data/masks_final_1_bg.dat"',...
+    %              'unary', 140, 4, 'binaryLearnedUnary("./data/masks_final_2_fg.dat")', 'binaryLearnedUnary("./data/masks_final_2_bg.dat"',...
+    %              'unary', 140, 1, 'seedUnary()', 'backgroundUnary({})', 0, 0, ... % Seed Proposals (v1.2 and newer)
+    %              'unary', 0, 5, 'zeroUnary()', 'backgroundUnary({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15})' ...
+    %              );
+    
+    imageData = imread(imagePath);
+        
+    % Create an over-segmentation
+    os = OverSegmentation(imageData);
+    % Generate proposals
+    props = p.propose(os);
+        
+    % Generate boxes around proposals, which is optional.
+    boxes = os.maskToBox(props);
+    
+    % ---Set arguments---
+    if nargin < 3
+        showProp = false;
+    end
+    if nargin < 2
+           maxPropNum = size(props, 1);
+    end
+    
+    masks = cell(maxPropNum, 1);
+    for index = 1:maxPropNum
+        m = props(index, :);
+        masks{index} = uint8(m(os.s() + 1));
+        if showProp == 1
+            show_op(imageData, masks{index}, boxes(index,:));
+            pause();
+        end
+    end
+end
