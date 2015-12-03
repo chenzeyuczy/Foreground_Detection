@@ -4,6 +4,7 @@ clear('all');
 addpath(genpath('vlfeat'));
 addpath('superpixel');
 addpath('Manifold_Ranking/');
+addpath(genpath('gop/'));
 
 dataset_path = '~/Documents/Lab/dataset/SegTrack_V1/';
 data_info = parse_segtrackv1(dataset_path);

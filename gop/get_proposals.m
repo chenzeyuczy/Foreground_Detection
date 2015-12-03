@@ -10,7 +10,7 @@
 %     - masks: Cell array which store proposal info within a image.
 
 
-function masks = get_gop(imagePath, maxPropNum, showProp)
+function [masks, boxes] = get_proposals(imagePath, maxPropNum, showProp)
     % ---Initialization---
     
     % Set a boundary detector by calling (before creating an OverSegmentation!):
@@ -34,10 +34,10 @@ function masks = get_gop(imagePath, maxPropNum, showProp)
     %              'unary', 0, 5, 'zeroUnary()', 'backgroundUnary({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15})' ...
     %              );
     
-    imageData = imread(imagePath);
+    img = imread(imagePath);
         
     % Create an over-segmentation
-    os = OverSegmentation(imageData);
+    os = OverSegmentation(img);
     % Generate proposals
     props = p.propose(os);
         
@@ -48,8 +48,10 @@ function masks = get_gop(imagePath, maxPropNum, showProp)
     if nargin < 3
         showProp = false;
     end
-    if nargin < 2
-           maxPropNum = size(props, 1);
+    if nargin > 1
+        maxPropNum = min(size(props, 1), maxPropNum);
+    else
+        maxPropNum = size(props, 1);
     end
     
     masks = cell(maxPropNum, 1);
@@ -57,7 +59,7 @@ function masks = get_gop(imagePath, maxPropNum, showProp)
         m = props(index, :);
         masks{index} = uint8(m(os.s() + 1));
         if showProp == 1
-            show_op(imageData, masks{index}, boxes(index,:));
+            show_op(img, masks{index}, boxes(index,:));
             pause();
         end
     end
