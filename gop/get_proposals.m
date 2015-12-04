@@ -2,15 +2,15 @@
 % using Geodestic Object Proposal Algorithm(GOP).
 % Writen by chenzy.
 % Input
-%     - imagePath: Path of the image to be processed.
+%     - imgPath: Path of the image to be processed.
 %     - maxPropNum: Maximum number of object proposals to return, set as
-%     size of proposal by default.
+%     size of proposals by default.
 %     - showProp: Option to determine whether to show proposals or not.
 % Output
 %     - masks: Cell array which store proposal info within a image.
 
 
-function [masks, boxes] = get_proposals(imagePath, maxPropNum, showProp)
+function [masks, boxes] = get_proposals(imgPath, maxPropNum, showProp)
     % ---Initialization---
     
     % Set a boundary detector by calling (before creating an OverSegmentation!):
@@ -34,7 +34,7 @@ function [masks, boxes] = get_proposals(imagePath, maxPropNum, showProp)
     %              'unary', 0, 5, 'zeroUnary()', 'backgroundUnary({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15})' ...
     %              );
     
-    img = imread(imagePath);
+    img = imread(imgPath);
         
     % Create an over-segmentation
     os = OverSegmentation(img);
