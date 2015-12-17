@@ -9,12 +9,7 @@ function saliency_map = manifold_ranking(input_im, opts)
     %%---------------parameter initialization------------%%
     theta = 10; % control the edge weight 
     alpha = 0.99; % control the balance of two items in manifold ranking cost function
-    saldir = './saliencymap/'; % the output path of the saliency map
     [m, n, k] = size(input_im);
-    
-    if exist(saldir, 'dir') ~= 7
-        mkdir(saldir);
-    end
 
     %%----------------------generate superpixels--------------------%%
     superpixels = process_sp_map(gen_sp(input_im, opts));

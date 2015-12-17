@@ -2,7 +2,7 @@
 % using Geodestic Object Proposal Algorithm(GOP).
 % Writen by chenzy.
 % Input
-%     - imgPath: Path of the image to be processed.
+%     - img: Image to be processed.
 %     - maxPropNum: Maximum number of object proposals to return, set as
 %     size of proposals by default.
 %     - showProp: Option to determine whether to show proposals or not.
@@ -10,13 +10,15 @@
 %     - masks: Cell array which store proposal info within a image.
 
 
-function [masks, boxes] = get_proposals(imgPath, maxPropNum, showProp)
+function [masks, boxes] = get_proposals(img, maxPropNum, showProp)    
     % ---Initialization---
     
     % Set a boundary detector by calling (before creating an OverSegmentation!):
     % gop_mex( 'setDetector', 'SketchTokens("./data/st_full_c.dat")' );
     % gop_mex( 'setDetector', 'StructuredForest("./data/sf.dat")' );
-    gop_mex( 'setDetector', 'MultiScaleStructuredForest("./data/sf.dat")' );
+    gop_mex( 'setDetector', 'MultiScaleStructuredForest("./gop/data/sf.dat")' );
+    % Watch out for the path here.
+    % Havn't found way to solve it yet.
 
     % Setup the proposal pipeline (baseline)
     p = Proposal('max_iou', 0.8,...
@@ -33,9 +35,7 @@ function [masks, boxes] = get_proposals(imgPath, maxPropNum, showProp)
     %              'unary', 140, 1, 'seedUnary()', 'backgroundUnary({})', 0, 0, ... % Seed Proposals (v1.2 and newer)
     %              'unary', 0, 5, 'zeroUnary()', 'backgroundUnary({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15})' ...
     %              );
-    
-    img = imread(imgPath);
-        
+            
     % Create an over-segmentation
     os = OverSegmentation(img);
     % Generate proposals
