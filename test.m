@@ -49,39 +49,56 @@ fprintf('Convert image format in %f s.\n', t);
 
 % Get proposals from image.
 tic();
-[prop1, ~] = get_proposals(img1);
+[prop1, box1] = get_proposals(img1);
 t1 = toc();
 fprintf('%d proposal(s) found in %f s.\n', length(prop1), t1);
 tic();
-[prop2, ~] = get_proposals(img2);
+[prop2, box2] = get_proposals(img2);
 t2 = toc();
 fprintf('%d proposal(s) found in %f s.\n', length(prop2), t2);
 
+% Decalare constants.
 max_prop_num = 100;
 
+% Preallocate memory space.
 prop_num1 = min(length(prop1), max_prop_num);
 prop_num2 = min(length(prop2), max_prop_num);
 prop_dist = zeros(prop_num1, prop_num2);
 size_sim = zeros(prop_num1, prop_num2);
+
+lastHist = cell(prop_num1, 1);
+size1 = zeros(prop_num1, 1);
+thisHist = cell(prop_num2, 1);
+size2 = zeros(prop_num2, 1);
+
+% Calculate features for proposals in both images.
+tic();
+for index = 1:prop_num1
+    prop = prop1{index};
+    rgbHist = get_mask_hist(img1, prop);
+    labHist = get_mask_hist(labImg1, prop);
+    ycbcrHist = get_mask_hist(ycbcrImg1, prop);
+    hsvHist = get_mask_hist(hsvImg1, prop);
+    lastHist{index} = merge_hist_info(rgbHist, labHist, ycbcrHist, hsvHist);
+    size1(index) = sum(prop(:));
+end
+for index = 1:prop_num2
+    prop = prop2{index};
+    rgbHist = get_mask_hist(img2, prop);
+    labHist = get_mask_hist(labImg2, prop);
+    ycbcrHist = get_mask_hist(ycbcrImg2, prop);
+    hsvHist = get_mask_hist(hsvImg2, prop);
+    thisHist{index} = merge_hist_info(rgbHist, labHist, ycbcrHist, hsvHist);
+    size1(index) = sum(prop(:));
+end
+t = toc();
+fprintf('Calculate features for %d proposals in img1 and %d proposals in img2 in %s s.\n', prop_num1, prop_num2, t);
+
 tic();
 for index1 = 1:prop_num1
-    p1 = prop1{index1};
-    rgbHist1 = get_mask_hist(img1, p1);
-    labHist1 = get_mask_hist(labImg1, p1);
-    ycbcrHist1 = get_mask_hist(ycbcrImg1, p1);
-    hsvHist1 = get_mask_hist(hsvImg1, p1);
-    lastHist = merge_hist_info(rgbHist1, labHist1, ycbcrHist1, hsvHist1);
-    size1 = sum(p1(:));
     for index2 = 1:prop_num2
-        p2 = prop2{index2};
-        rgbHist2 = get_mask_hist(img2, p2);
-        labHist2 = get_mask_hist(labImg2, p2);
-        ycbcrHist2 = get_mask_hist(ycbcrImg2, p2);
-        hsvHist2 = get_mask_hist(hsvImg2, p2);
-        thisHist = merge_hist_info(rgbHist2, labHist2, ycbcrHist2, hsvHist2);
-        prop_dist(index1, index2) = 0.5 * (sum((thisHist - lastHist) .^ 2 ./ (thisHist + lastHist + eps)));
-        size2 = sum(p2(:));
-        size_sim(index1, index2) = 1.0 * abs(size1 - size2) / max(size1, size2);
+        prop_dist(index1, index2) = 0.5 * (sum((thisHist{index2} - lastHist{index1}) .^ 2 ./ (thisHist{index2} + lastHist{index1} + eps)));
+        size_sim(index1, index2) = 1.0 * abs(size1(index1) - size2(index2)) / max(size1(index1), size2(index2));
     end
 end
 t = toc();
