@@ -5,6 +5,9 @@
 %     - dim: Number of bins in histogram.
 % Output
 %     - feat: Histogram features extracted from an image.
+% Attention:
+%   This function is deprecated since it execute image convertion
+% many times, use get_mask_hist and merge_hist_info instead.
 
 function feat = getMaskHist(img, propMask, dim)
     % Parameter initialization.
@@ -75,7 +78,6 @@ function feat = getMaskHist(img, propMask, dim)
 	hTmp = hTmp(:);
 	sTmp = sTmp(:);
 	vTmp = vTmp(:);
-	
 	
 	feat =[rTmp;gTmp;bTmp;lTmp;aTmp;brTmp;yTmp;cbTmp;crTmp;hTmp;sTmp;vTmp];
 	% Histogram normalization.
