@@ -1,13 +1,15 @@
 % Function to generate object proposal from image,
 % using Geodestic Object Proposal Algorithm(GOP).
-% Writen by chenzy.
 % Input
-%     - img: Image to be processed.
-%     - maxPropNum: Maximum number of object proposals to return, set as
-%     size of proposals by default.
-%     - showProp: Option to determine whether to show proposals or not.
+%   - img: Image to be processed.
+%   - maxPropNum: Maximum number of object proposals to return, set as
+%   size of proposals by default.
+%   - showProp: Option to determine whether to show proposals or not.
 % Output
-%     - masks: Cell array which store proposal info within a image.
+%   - masks: Cell array which restore proposal info within a image.
+%   - boxes: A two dimension matrix which restores bounding boxes around
+%   proposals.
+% Writen by chenzy.
 
 
 function [masks, boxes] = get_proposals(img, maxPropNum, showProp)    
