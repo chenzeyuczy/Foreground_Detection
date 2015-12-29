@@ -4,15 +4,22 @@
 %   - img1: Image one.
 %   - img2: Image two.
 %   - max_prop_num: Maximum of proposals seleceted, whose default value is 100.
+%   - pair_select_num: Number of pairs of matched proposals to be returned,
+%   whose default value is the same as max_prop_num..
 % Output
+%   - prop1: Proposals for image 1.
+%   - prop2: Proposals for image 2.
 %   - matchedIndex: A two-dimension array indicating index of best-fit
 %   proposals from the two images.
 % Writen by chenzy.
 
-function matchedIndex = match_proposals(img1, img2, max_prop_num)
+function [prop1, prop2, box1, box2, matchedIndex] = match_proposals(img1, img2, max_prop_num, pair_select_num)
     % Set up default parameter.
     if nargin < 3
         max_prop_num = 100;
+    end
+    if nargin < 4
+        pair_select_num = max_prop_num;
     end
     
     % Convert to diverse color space.
@@ -89,9 +96,10 @@ function matchedIndex = match_proposals(img1, img2, max_prop_num)
     t = toc();
     fprintf('Calculate %d * %d distance in %f s.\n', prop_num1, prop_num2, t);
 
-    rank_dist = prop_dist + size_sim + shape_sim;
+    rank_dist = 1 * prop_dist + 1 * size_sim + 1 * shape_sim;
     [~, disIdx] = sort(rank_dist(:));
-    colIdx = ceil(disIdx / size(rank_dist, 1));
     rowIdx = mod(disIdx - 1, size(rank_dist, 2)) + 1;
-    matchedIndex = [colIdx(:); rowIdx(:)];
+    colIdx = ceil(disIdx / size(rank_dist, 1));
+    matchedIndex = [rowIdx(:), colIdx(:)];
+    matchedIndex = matchedIndex(1:pair_select_num, :);
 end

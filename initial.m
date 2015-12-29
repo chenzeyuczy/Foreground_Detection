@@ -7,19 +7,20 @@ clear('all');
 addpath(genpath('vlfeat/'));
 addpath('superpixel/');
 addpath('Manifold_Ranking/');
+addpath('Preprocess/');
 addpath('Stage1/');
 addpath('Stage2/');
 addpath(genpath('gop/'));
+addpath('test/');
 
 % Import data.
-dataset_path = '~/Documents/Lab/dataset/SegTrack_V1/';
-data_info = parse_segtrackv1(dataset_path);
+import_data;
 
 % Choose video.
-videoIndex = 3;
+videoIndex = 4;
 images = data_info{videoIndex}.data;
-ground_truths = data_info{videoIndex}.gt;
-imageNum = length(images);
+ground_truth = data_info{videoIndex}.gt;
+imgNum = length(images);
 
 % Initialize parameters.
 opts.slic_regionsize = 20;
