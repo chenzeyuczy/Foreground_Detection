@@ -3,13 +3,13 @@
 % import_data;
 
 video_num = 5;
-% init_prop = cell(video_num, 1);
 
-videoIndex = 3;
+videoIndex = 2;
 images = data_info{videoIndex}.data;
-gts = data_info{videoIndex}.gt;
+% gts = data_info{videoIndex}.gt;
 img_num = length(images);
 
+tic();
 switch videoIndex
     case 1
         init_mask = get_init_mask_1(images);
@@ -22,10 +22,13 @@ switch videoIndex
     case 5
         init_mask = get_init_mask_5(images);
 end
+toc();
 
 for imgIndex = 1:img_num
     mask = init_mask{imgIndex};
     imshow(mask);
     fprintf('Image %d in video %d.\n', imgIndex, videoIndex);
-    pause();
+    filePath = [pwd '/result/' num2str(videoIndex) '_' num2str(imgIndex) '.png'];
+    imwrite(mask, filePath);
+    pause(0.1);
 end

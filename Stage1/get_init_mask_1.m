@@ -2,7 +2,7 @@
 % Input
 %   images: Images from video.
 % Output
-%   init: Initial mask for videos.
+%   init_mask: Initial mask for videos.
 % Writen by chenzy.
 
 function init_mask = get_init_mask_1(images)

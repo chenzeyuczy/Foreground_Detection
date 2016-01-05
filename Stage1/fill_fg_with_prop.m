@@ -20,7 +20,7 @@ function mask = fill_fg_with_prop(init_fg, props, top_rank)
 		prop = props{prop_index};
 		% Skip proposals that have been involved in the initial mask.
 		if ~isequal((init_fg & prop), prop)
-			overlap_ratio{prop_index} = get_overlap(init_fg, prop);
+			overlap_ratio(prop_index) = get_overlap(init_fg, prop);
 		end
 	end
 	[~, idx] = sort(overlap_ratio, 'descend');
