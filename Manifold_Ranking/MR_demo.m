@@ -6,9 +6,9 @@
 %%------------------------set parameters---------------------%%
 theta = 10; % control the edge weight 
 alpha = 0.99; % control the balance of two items in manifold ranking cost function
-imgRoot = '../../dataset/SegTrack_V1/girl/'; % test image path
+imgRoot = '../../dataset/SegTrack_V1/monkeydog/'; % test image path
 saldir = './saliencymap/'; % the output path of the saliency map
-mkdir(saldir);
+% mkdir(saldir);
 imnames = dir([imgRoot '*' 'bmp']);
 
 for ii = 1:length(imnames)   
@@ -107,10 +107,13 @@ for ii = 1:length(imnames)
      
      mapstage1 = zeros(m, n);
      mapstage1(1:m,1:n) = tmapstage1;
-     mapstage1 = uint8(mapstage1*255);  
+     mapstage1 = uint8(mapstage1*255);
 
-     outname = [saldir imnames(ii).name(1:end-4) '_stage1' '.png'];
-     imwrite(mapstage1,outname);
+%      outname = [saldir imnames(ii).name(1:end-4) '_stage1' '.png'];
+%      imwrite(mapstage1, outname);
+
+    subplot(1, 3, 1);
+    imshow(mapstage1);
 
 %%----------------------stage2-------------------------%%
 % binary with an adaptive threhold (i.e. mean of the saliency map)
@@ -131,7 +134,19 @@ for ii = 1:length(imnames)
     mapstage2 = zeros(m,n);
     mapstage2(1:m,1:n) = tmapstage2;
     mapstage2 = uint8(mapstage2*255);
-    outname = [saldir imnames(ii).name(1:end-4) '_stage2' '.png'];   
-    imwrite(mapstage2,outname);
+%     outname = [saldir imnames(ii).name(1:end-4) '_stage2' '.png'];   
+%     imwrite(mapstage2, outname);
+
+    subplot(1, 3, 2);
+    imshow(mapstage2);
+    fgMap = im2bw(mapstage2, graythresh(mapstage2));
+    subplot(1, 3, 3);
+    imshow(fgMap);
+    
+    if ii < 8
+        pause();
+    else
+        pause(0.8);
+    end
     
 end
