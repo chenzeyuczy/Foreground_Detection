@@ -24,11 +24,12 @@ switch videoIndex
 end
 toc();
 
-% for imgIndex = 1:img_num
-%     mask = init_mask{imgIndex};
-%     imshow(mask);
-%     fprintf('Image %d in video %d.\n', imgIndex, videoIndex);
-%     filePath = [pwd '/result/' num2str(videoIndex) '_' num2str(imgIndex) '.png'];
-%     imwrite(mask, filePath);
-%     pause(0.1);
-% end
+for imgIndex = 1:img_num
+    mask = init_mask{imgIndex};
+    imshow(mask);
+    set(gcf, 'name', ['Image ' num2str(imgIndex)], 'numbertitle', 'off');
+    fprintf('Image %d in video %d.\n', imgIndex, videoIndex);
+    filePath = [pwd '/result/' num2str(videoIndex) '_' num2str(imgIndex) '.png'];
+    imwrite(mask, filePath);
+    pause(0.1);
+end
