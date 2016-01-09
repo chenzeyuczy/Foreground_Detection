@@ -2,12 +2,12 @@
 
 % import_data;
 
-video_num = 5;
-
-videoIndex = 5;
-images = data_info{videoIndex}.data;
-% gts = data_info{videoIndex}.gt;
-img_num = length(images);
+% video_num = 5;
+% 
+% videoIndex = 5;
+% images = data_info{videoIndex}.data;
+% % gts = data_info{videoIndex}.gt;
+% img_num = length(images);
 
 tic();
 switch videoIndex
