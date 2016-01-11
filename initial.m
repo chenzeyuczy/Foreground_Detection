@@ -1,8 +1,6 @@
 % This is the initialization script.
 % Writen by chenzy.
 
-clear('all');
-
 % Add library and subfolders into path.
 addpath(genpath('vlfeat/'));
 addpath('superpixel/');
