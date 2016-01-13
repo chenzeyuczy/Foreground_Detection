@@ -4,6 +4,7 @@
 
 # Cache
 .DS_Store
+*.asv
 
 # Data files.
 *.dat
