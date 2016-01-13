@@ -70,12 +70,12 @@ function init_mask = get_init_mask_5(images)
             end
             init_mask{imgIndex} = init_mask{imgIndex} | p;
         end
-        subplot(1, 3, 1);
-        imshow(diff_mask{imgIndex});
+%         subplot(1, 3, 1);
+%         imshow(diff_mask{imgIndex});
         mask_ratio = sum(sum(init_mask{imgIndex})) / img_size;
-        fprintf('Mask ratio for image %d: %f\n', imgIndex, mask_ratio);
-        subplot(1, 3, 2);
-        imshow(init_mask{imgIndex});
+%         fprintf('Mask ratio for image %d: %f\n', imgIndex, mask_ratio);
+%         subplot(1, 3, 2);
+%         imshow(init_mask{imgIndex});
         if mask_ratio < min_mask_ratio1
             init_mask{imgIndex} = fill_fg_with_prop(init_mask{imgIndex}, props, 4);
         elseif mask_ratio < min_mask_ratio2
@@ -83,9 +83,9 @@ function init_mask = get_init_mask_5(images)
         elseif mask_ratio < min_mask_ratio3
             init_mask{imgIndex} = fill_fg_with_prop(init_mask{imgIndex}, props, 2);
         end
-        subplot(1, 3, 3);
-        imshow(init_mask{imgIndex});
-        set(gcf, 'name', ['Image ' num2str(imgIndex)], 'numbertitle', 'off');
-        pause(0.1);
+%         subplot(1, 3, 3);
+%         imshow(init_mask{imgIndex});
+%         set(gcf, 'name', ['Image ' num2str(imgIndex)], 'numbertitle', 'off');
+%         pause(0.1);
     end
 end

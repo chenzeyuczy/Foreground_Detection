@@ -14,7 +14,7 @@ function [dataset_info] = parse_segtrackv1(segtrack_root)
     dataset_info = cell(length(video_name), 1);
 
 	for i = 1:length(video_name)
-		dataset_info{i}.data_name=video_name(i).name;
+		dataset_info{i}.data_name = video_name(i).name;
 		video_root = [segtrack_root video_name(i).name '/'];
 		video_info = dir(video_root);
 		video_info(1:2) = [];
