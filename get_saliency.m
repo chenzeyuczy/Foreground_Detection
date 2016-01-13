@@ -5,23 +5,27 @@
 % Output:
 %   - saliency_map: The saliency map for image, ranging from 0 to 1.
 
-function saliency_map = manifold_ranking2(input_im, opts)
+function saliency_map = get_saliency(input_im)
     %%---------------parameter initialization------------%%
     theta = 10; % control the edge weight 
     alpha = 0.99; % control the balance of two items in manifold ranking cost function
     [m, n, k] = size(input_im);
 
     %%----------------------generate superpixels--------------------%%
-    tmp_img_name = 'temp_img.bmp';
     sp_dir = 'test/';
+    if exist(sp_dir) ~= 7
+        mkdir(sp_dir);
+    end
+    tmp_img_name = 'temp_img.bmp';
     sp_num = 200;
     imwrite(input_im, tmp_img_name);
-    command = ['SLICSuperpixelSegmentation' ' ' tmp_img_name ' ' int2str(20) ' ' int2str(sp_num) ' ' sp_dir];
+    command = ['SLICSuperpixelSegmentation' ' ' [sp_dir tmp_img_name] ' ' int2str(20) ' ' int2str(sp_num) ' ' sp_dir];
     system(command);
-    spname = [sp_dir tmp_img_name(1:end-4)  '.dat'];
-    superpixels = ReadDAT([m,n], spname); % superpixel label matrix
+    sp_name = [sp_dir tmp_img_name(1:end-4)  '.dat'];
+    superpixels = ReadDAT([m,n], sp_name); % superpixel label matrix
+    delete(tmp_img_name);
+    delete(sp_name);
     
-%     superpixels = process_sp_map(gen_sp(input_im, opts));
     spnum = max(superpixels(:)); % the actual superpixel number
 
     %%----------------------design the graph model--------------------------%%

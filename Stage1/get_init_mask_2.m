@@ -55,8 +55,8 @@ function init_mask = get_init_mask_2(images)
             init_mask{imgIndex} = init_mask{imgIndex} | p;
         end
         init_mask{imgIndex} = fill_fg_with_prop(init_mask{imgIndex}, props, 1);
-        imshow(init_mask{imgIndex});
-        title(num2str(imgIndex));
-        pause(0.1);
+%         imshow(init_mask{imgIndex});
+%         title(num2str(imgIndex));
+%         pause(0.1);
     end
 end

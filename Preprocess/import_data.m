@@ -1,8 +1,6 @@
 % This is a script to import data from dataset.
 % Writen by chenzy.
 
-clear all;
-
 dataset_path = 'D:\Dataset\SegTrack_V1\';
 data_info = parse_segtrackv1(dataset_path);
 

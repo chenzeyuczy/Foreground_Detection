@@ -62,11 +62,11 @@ function init_mask = get_init_mask_1(images)
 %         diff = imerode(diff, m0) | imerode(diff, m1);
         diff = imdilate(diff, m2);
         init_mask{imgIndex} = diff;
-        subplot(1, 2, 1);
-        imshow(diff_mask{imgIndex});
-        subplot(1, 2, 2);
-        imshow(init_mask{imgIndex});
-        set(gcf, 'name', ['Image ' num2str(imgIndex)], 'numbertitle', 'off');
-        pause(0.1);
+%         subplot(1, 2, 1);
+%         imshow(diff_mask{imgIndex});
+%         subplot(1, 2, 2);
+%         imshow(init_mask{imgIndex});
+%         set(gcf, 'name', ['Image ' num2str(imgIndex)], 'numbertitle', 'off');
+%         pause(0.1);
     end
 end
