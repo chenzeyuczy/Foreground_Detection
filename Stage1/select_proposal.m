@@ -1,8 +1,8 @@
 % Function to match proposals within adjacent images, only operates upon
 % top K proposals in each image.
 % Input
-%   - img1: Image one.
-%   - img2: Image two.
+%   - img1: Previous image.
+%   - img2: Current image.
 %   - mask: Mask to filterate proposals.
 %   - max_prop_num: Maximum of proposals seleceted, whose default value is 100.
 %   - pair_select_num: Number of pairs of matched proposals to be returned,
@@ -21,30 +21,27 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
     end
     
     % Convert to diverse color space.
-    tic();
+%     tic();
     labImg1 = rgb2lab(img1);
     ycbcrImg1 = rgb2ycbcr(img1);
     hsvImg1 = rgb2hsv(img1);
-    t = toc();
-    fprintf('Convert image format in %f s.\n', t);
-    tic();
     labImg2 = rgb2lab(img2);
     ycbcrImg2 = rgb2ycbcr(img2);
     hsvImg2 = rgb2hsv(img2);
-    t = toc();
-    fprintf('Convert image format in %f s.\n', t);
+%     t = toc();
+%     fprintf('Convert image format in %f s.\n', t);
     
     % Get proposals from image.
-    tic();
+%     tic();
     [prop1, box1] = get_proposals(img1);
     min_overlap = 0.8;
     prop1 = filter_prop_with_mask(mask, prop1, min_overlap);
-    t1 = toc();
-    fprintf('%d proposal(s) found in %f s.\n', length(prop1), t1);
-    tic();
+%     t1 = toc();
+%     fprintf('%d proposal(s) found in %f s.\n', length(prop1), t1);
+%     tic();
     [prop2, box2] = get_proposals(img2);
-    t2 = toc();
-    fprintf('%d proposal(s) found in %f s.\n', length(prop2), t2);
+%     t2 = toc();
+%     fprintf('%d proposal(s) found in %f s.\n', length(prop2), t2);
     
     % Preallocate memory space.
     prop_num1 = min(length(prop1), max_prop_num);
@@ -59,7 +56,7 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
     size2 = zeros(prop_num2, 1);
 
     % Calculate features for proposals in both images.
-    tic();
+%     tic();
     for index = 1:prop_num1
         prop = prop1{index};
         rgbHist = get_mask_hist(img1, prop);
@@ -82,10 +79,10 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
     height1 = box1(:,4) - box1(:,2);
     width2 = box2(:,3) - box2(:,1);
     height2 = box2(:,4) - box2(:,2);
-    t = toc();
-    fprintf('Calculate features for %d proposals in img1 and %d proposals in img2 in %s s.\n', prop_num1, prop_num2, t);
+%     t = toc();
+%     fprintf('Calculate features for %d proposals in img1 and %d proposals in img2 in %s s.\n', prop_num1, prop_num2, t);
 
-    tic();
+%     tic();
     for index1 = 1:prop_num1
         for index2 = 1:prop_num2
             prop_dist(index1, index2) = 0.5 * (sum((thisHist{index2} - lastHist{index1}) .^ 2 ./ (thisHist{index2} + lastHist{index1} + eps)));
@@ -93,8 +90,8 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
             shape_sim(index1, index2) = abs((width1(index1) - width2(index2)) * (height1(index1) - height2(index2))) / (eps + abs(width1(index1) * height1(index1) - width2(index2) * height2(index2)));
         end
     end
-    t = toc();
-    fprintf('Calculate %d * %d distance in %f s.\n', prop_num1, prop_num2, t);
+%     t = toc();
+%     fprintf('Calculate %d * %d distance in %f s.\n', prop_num1, prop_num2, t);
 
     rank_dist = 1 * prop_dist + 1 * size_sim + 1 * shape_sim;
     [~, disIdx] = sort(rank_dist(:));

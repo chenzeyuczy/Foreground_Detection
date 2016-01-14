@@ -2,7 +2,7 @@
 % if the bg changes fast, then use a small numTrain and large learning rate, to make the bg update fast; or vice versa.
 
 function detectGMM()
-	iDataset = 2;
+	iDataset = 4;
 	switch iDataset
 		case 1
 			numTrain = 5; learnRate = 0.005;
@@ -25,8 +25,8 @@ end
 
 function fgMask = getMaskGMM(iDataset, numTrain,learnRate)
     % Import data.
-    segtrack_root = '~/Documents/Lab/dataset/SegTrack_V1/';
-	dataset_info = parse_segtrackv1(segtrack_root);
+    dataset_path = 'D:\Dataset\SegTrack_V1\';
+	dataset_info = parse_segtrackv1(dataset_path);
 	img_cell = dataset_info{iDataset}.data;
     img_num = length(img_cell);
     fgMask = cell(img_num, 1);

@@ -1,16 +1,17 @@
 % Script to get initial mask from videos.
 
-clear all;
-import_data;
+% clear all;
+% import_data;
+% 
+% video_num = 5;
+% accuracy = cell(video_num, 1);
+% recall = cell(video_num, 1);
+% error_rate = cell(video_num, 1);
+% foreground = cell(video_num, 1);
+% t = zeros(video_num, 1);
+% avg_time = zeros(video_num, 1);
 
-video_num = 5;
-accuracy = cell(video_num, 1);
-recall = cell(video_num, 1);
-error_rate = cell(video_num, 1);
-foreground = cell(video_num, 1);
-t = cell(video_num, 1);
-
-for videoIndex = 1:video_num
+for videoIndex = 1
     images = data_info{videoIndex}.data;
     gts = data_info{videoIndex}.gt;
     img_num = length(images);
@@ -33,8 +34,10 @@ for videoIndex = 1:video_num
             init_mask = get_init_mask_5(images);
     end
     foreground{videoIndex} = init_mask;
-    t{videoIndex} = toc();
-    fprintf('Video %d in %s seconds.\n', videoIndex, t{videoIndex});
+    t(videoIndex) = toc();
+    fprintf('Process video %d in %s seconds.\n', videoIndex, t(videoIndex));
+    avg_time(videoIndex) = t(videoIndex) / img_num;
+    fprintf('%f seconds per frame.\n', avg_time(videoIndex));
 
     for imgIndex = 1:img_num
         mask = foreground{videoIndex}{imgIndex};
@@ -63,6 +66,6 @@ for videoIndex = 1:video_num
         end
         imwrite(mask, filePath);
 
-        pause(0.6);
+%         pause(0.6);
     end
 end
