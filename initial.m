@@ -11,6 +11,7 @@ addpath('Preprocess/');
 addpath('Stage1/');
 addpath('Stage2/');
 addpath(genpath('gop/'));
+addpath('tool/');
 addpath('test/');
 
 % Import data.

@@ -1,14 +1,16 @@
 % Script to get initial mask from videos.
 
+clear all;
 import_data;
 
 video_num = 5;
 accuracy = cell(video_num, 1);
 recall = cell(video_num, 1);
+error_rate = cell(video_num, 1);
 foreground = cell(video_num, 1);
 t = cell(video_num, 1);
 
-for videoIndex = 1:video_num;
+for videoIndex = 1:video_num
     images = data_info{videoIndex}.data;
     gts = data_info{videoIndex}.gt;
     img_num = length(images);
@@ -35,15 +37,16 @@ for videoIndex = 1:video_num;
     fprintf('Video %d in %s seconds.\n', videoIndex, t{videoIndex});
 
     for imgIndex = 1:img_num
-        mask = init_mask{imgIndex};
+        mask = foreground{videoIndex}{imgIndex};
         gt = gts{imgIndex};
 
         % Calculate performance.
-        [acc, rc] = get_hit_rate(mask, gt);
+        [acc, rc, err] = get_hit_rate(mask, gt);
         fprintf('Image %d in video %d.\n', imgIndex, videoIndex);
-        fprintf('Accuracy: %f, Recall: %f.\n', acc, rc);
+        fprintf('Accuracy: %f, Recall: %f. Error: %f.\n', acc, rc, err);
         accuracy{videoIndex}(imgIndex) = acc;
         recall{videoIndex}(imgIndex) = rc;
+        error_rate{videoIndex}(imgIndex) = err;
 
         % Show image.
         subplot(1, 2, 1);

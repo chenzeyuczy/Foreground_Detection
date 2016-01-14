@@ -3,7 +3,7 @@
 *.tmp
 
 # Cache
-.DS_Store
+*.DS_Store
 *.asv
 
 # Data files.
