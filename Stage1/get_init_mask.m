@@ -2,9 +2,9 @@
 
 % clear all;
 % import_data;
-% 
+
 % video_num = 5;
-% accuracy = cell(video_num, 1);
+% precision = cell(video_num, 1);
 % recall = cell(video_num, 1);
 % error_rate = cell(video_num, 1);
 % foreground = cell(video_num, 1);
@@ -16,7 +16,7 @@ for videoIndex = 1
     gts = data_info{videoIndex}.gt;
     img_num = length(images);
     
-    accuracy{videoIndex} = zeros(img_num, 1);
+    precision{videoIndex} = zeros(img_num, 1);
     recall{videoIndex} = zeros(img_num, 1);
 
     fprintf('Processing video %d...\n', videoIndex);
@@ -44,10 +44,10 @@ for videoIndex = 1
         gt = gts{imgIndex};
 
         % Calculate performance.
-        [acc, rc, err] = get_hit_rate(mask, gt);
+        [pcs, rc, err] = get_hit_rate(mask, gt);
         fprintf('Image %d in video %d.\n', imgIndex, videoIndex);
-        fprintf('Accuracy: %f, Recall: %f. Error: %f.\n', acc, rc, err);
-        accuracy{videoIndex}(imgIndex) = acc;
+        fprintf('Accuracy: %f, Recall: %f. Error: %f.\n', pcs, rc, err);
+        precision{videoIndex}(imgIndex) = pcs;
         recall{videoIndex}(imgIndex) = rc;
         error_rate{videoIndex}(imgIndex) = err;
 
