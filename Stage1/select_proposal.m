@@ -29,10 +29,12 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
     hsvImg2 = rgb2hsv(img2);
     
     % Get proposals from image.
-    [prop1, box1] = get_proposals(img1);
     min_overlap = 0.8;
+    max_size_ratio = 0.01;
+    [prop1, box1] = get_proposals(img1);
     prop1 = filter_prop_with_mask(mask, prop1, min_overlap);
     [prop2, box2] = get_proposals(img2);
+    prop2 = filter_prop_with_size(mask, prop2, max_size_ratio);
     
     % Preallocate memory space.
     prop_num1 = min(length(prop1), max_prop_num);
@@ -93,12 +95,29 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
 end
 
 % Filter proposals with mask whose overlap ratio is larger than theshold.
-function result = filter_prop_with_mask(mask, props, min_overlap, max_size_ratio)
-    if nargin < 4
-        max_size_ratio = 0.01;
-    end
+function result = filter_prop_with_mask(mask, props, min_overlap)
     if nargin < 3
         min_overlap = 0.8;
+    end
+    
+    counter = 0;
+    prop_num = length(props);
+    
+    for prop_index = 1:prop_num
+        prop = props{prop_index};
+        prop_size = sum(prop(:));
+        overlap = sum(sum(prop & mask)) / prop_size;
+        if overlap >= min_overlap
+            counter = counter + 1;
+            result{counter} = prop;
+        end
+    end
+end
+
+% Filter proposals with size larger than theshold.
+function result = filter_prop_with_size(mask, props, max_size_ratio)
+    if nargin < 3
+        max_size_ratio = 0.01;
     end
     
     counter = 0;
@@ -110,8 +129,7 @@ function result = filter_prop_with_mask(mask, props, min_overlap, max_size_ratio
     for prop_index = 1:prop_num
         prop = props{prop_index};
         prop_size = sum(prop(:));
-        overlap = sum(sum(prop & mask)) / prop_size;
-        if overlap >= min_overlap && prop_size <= max_size
+        if prop_size <= max_size
             counter = counter + 1;
             result{counter} = prop;
         end

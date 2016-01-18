@@ -8,13 +8,13 @@ precision2 = cell(video_num, 1);
 recall2 = cell(video_num, 1);
 t2 = zeros(video_num, 1);
 
-for video_index = 1:video_num
+for video_index = 4
     video_name = data_info{video_index}.data_name;
     images = data_info{video_index}.data;
     gts = data_info{video_index}.gt;
     masks = foreground{video_index};
 
-%     img_num = length(images);
+    img_num = length(images);
     pcs1 = zeros(img_num, 1);
     pcs2 = zeros(img_num, 1);
     rc1 = zeros(img_num, 1);

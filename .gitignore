@@ -12,3 +12,5 @@
 # Unused files.
 test/
 result/
+
+test.m

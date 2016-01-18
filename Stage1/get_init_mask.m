@@ -1,7 +1,7 @@
 % Script to get initial mask from videos.
 
-% clear all;
-% import_data;
+clear all;
+import_data;
 
 video_num = 5;
 precision = cell(video_num, 1);
@@ -11,7 +11,7 @@ foreground = cell(video_num, 1);
 t = zeros(video_num, 1);
 avg_time = zeros(video_num, 1);
 
-for video_index = 1:video_num
+for video_index = 4
     images = data_info{video_index}.data;
     gts = data_info{video_index}.gt;
     img_num = length(images);
