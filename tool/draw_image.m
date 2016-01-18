@@ -7,11 +7,11 @@ for video_index = 1:video_num
     video_name = data_info{video_index}.data_name;
     pcs = precision{video_index};
     rc = recall{video_index};
-    err = error_rate{video_index};
+%     err = error_rate{video_index};
     clf();
     hold on;
-    plot(pcs, 'Color', 'r', 'LineWidth', 1);
-    plot(rc, 'Color', 'g', 'LineWidth', 1);
+    plot(pcs, 'Color', 'r', 'LineWidth', 1, 'LineStyle', '-', 'Marker', 'o');
+    plot(rc, 'Color', 'g', 'LineWidth', 1, 'LineStyle', '--', 'Marker', '+');
 %     plot(err, 'Color', 'b', 'LineWidth', 1);
     axis([0, inf, 0, 1]);
     set(gcf, 'name', ['Video ' num2str(video_index)], 'numbertitle', 'off');

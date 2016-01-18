@@ -6,6 +6,7 @@ precision1 = cell(video_num, 1);
 recall1 = cell(video_num, 1);
 precision2 = cell(video_num, 1);
 recall2 = cell(video_num, 1);
+t2 = zeros(video_num, 1);
 
 for video_index = 1:video_num
     video_name = data_info{video_index}.data_name;
@@ -13,7 +14,7 @@ for video_index = 1:video_num
     gts = data_info{video_index}.gt;
     masks = foreground{video_index};
 
-    img_num = length(images);
+%     img_num = length(images);
     pcs1 = zeros(img_num, 1);
     pcs2 = zeros(img_num, 1);
     rc1 = zeros(img_num, 1);
@@ -26,7 +27,9 @@ for video_index = 1:video_num
         gt = gts{img_index};
         saliency1 = MR_image(img, opts, mask);
         saliency2 = im2bw(saliency1, graythresh(saliency1));
-        toc();
+        t2(video_index) = toc();
+        
+        % Evaluate performance.
         [pcs1(img_index), rc1(img_index), ~] = get_hit_rate(mask, gt);
         [pcs2(img_index), rc2(img_index), ~] = get_hit_rate(saliency2, gt);
 
@@ -51,10 +54,11 @@ for video_index = 1:video_num
     end
     
     precision1{video_index} = pcs1;
-    recall1{video_index} = cs1;
+    recall1{video_index} = rc1;
     precision1{video_index} = pcs2;
-    recall2{video_index} = cs2;
+    recall2{video_index} = rc2;
 
+    % Draw image.
     subplot(1, 1, 1);
     hold on;
     plot(pcs1, 'Color', 'r', 'LineWidth', 1, 'LineStyle', '-', 'Marker', 'o');

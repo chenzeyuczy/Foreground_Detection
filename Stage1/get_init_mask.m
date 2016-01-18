@@ -43,7 +43,7 @@ for video_index = 1:video_num
         mask = foreground{video_index}{imgIndex};
         gt = gts{imgIndex};
 
-        % Calculate performance.
+        % Evaluate performance.
         [pcs, rc, err] = get_hit_rate(mask, gt);
         fprintf('Image %d in video %d.\n', imgIndex, video_index);
         fprintf('Accuracy: %f, Recall: %f. Error: %f.\n', pcs, rc, err);
