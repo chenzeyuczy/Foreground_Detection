@@ -21,7 +21,11 @@ function sp_map = gen_sp(img, opts)
     img_lab = vl_xyz2lab(vl_rgb2xyz(img));
     img_lab = im2single(img_lab);
     
-    sp_map = vl_slic(img_lab, region_size, regularizer);	 % uint32 mat: ind of each pixel
+    if exist('opts.slic_minregionsize') ~= 1
+        sp_map = vl_slic(img_lab, region_size, regularizer);	 % uint32 mat: ind of each pixel
+    else
+        sp_map = vl_slic(img_lab, region_size, regularizer, opts.slic_minregionsize);
+    end
     
     % Show image.
     if opts.show_sp_map == 1

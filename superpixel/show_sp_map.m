@@ -14,7 +14,10 @@ function [] = show_sp_map(img, sp_map, region_size, regularizer)
     imshow(imp,[]);
     axis image off ;
     hold on ;
-    text(5, 5, sprintf('regionSize:%.2g\nregularizer:%.2g', region_size, regularizer), ...
-         'Background', 'white', 'VerticalAlignment', 'top')
+    
+    if nargin > 3
+        text(5, 5, sprintf('regionSize:%.2g\nregularizer:%.2g', region_size, regularizer), ...
+            'Background', 'white', 'VerticalAlignment', 'top');
+    end
 
 end

@@ -21,27 +21,18 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
     end
     
     % Convert to diverse color space.
-%     tic();
     labImg1 = rgb2lab(img1);
     ycbcrImg1 = rgb2ycbcr(img1);
     hsvImg1 = rgb2hsv(img1);
     labImg2 = rgb2lab(img2);
     ycbcrImg2 = rgb2ycbcr(img2);
     hsvImg2 = rgb2hsv(img2);
-%     t = toc();
-%     fprintf('Convert image format in %f s.\n', t);
     
     % Get proposals from image.
-%     tic();
     [prop1, box1] = get_proposals(img1);
     min_overlap = 0.8;
     prop1 = filter_prop_with_mask(mask, prop1, min_overlap);
-%     t1 = toc();
-%     fprintf('%d proposal(s) found in %f s.\n', length(prop1), t1);
-%     tic();
     [prop2, box2] = get_proposals(img2);
-%     t2 = toc();
-%     fprintf('%d proposal(s) found in %f s.\n', length(prop2), t2);
     
     % Preallocate memory space.
     prop_num1 = min(length(prop1), max_prop_num);
@@ -56,7 +47,6 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
     size2 = zeros(prop_num2, 1);
 
     % Calculate features for proposals in both images.
-%     tic();
     for index = 1:prop_num1
         prop = prop1{index};
         rgbHist = get_mask_hist(img1, prop);
@@ -79,10 +69,7 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
     height1 = box1(:,4) - box1(:,2);
     width2 = box2(:,3) - box2(:,1);
     height2 = box2(:,4) - box2(:,2);
-%     t = toc();
-%     fprintf('Calculate features for %d proposals in img1 and %d proposals in img2 in %s s.\n', prop_num1, prop_num2, t);
-
-%     tic();
+    
     for index1 = 1:prop_num1
         for index2 = 1:prop_num2
             prop_dist(index1, index2) = 0.5 * (sum((thisHist{index2} - lastHist{index1}) .^ 2 ./ (thisHist{index2} + lastHist{index1} + eps)));
@@ -90,8 +77,6 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
             shape_sim(index1, index2) = abs((width1(index1) - width2(index2)) * (height1(index1) - height2(index2))) / (eps + abs(width1(index1) * height1(index1) - width2(index2) * height2(index2)));
         end
     end
-%     t = toc();
-%     fprintf('Calculate %d * %d distance in %f s.\n', prop_num1, prop_num2, t);
 
     rank_dist = 1 * prop_dist + 1 * size_sim + 1 * shape_sim;
     [~, disIdx] = sort(rank_dist(:));
@@ -108,18 +93,27 @@ function prop_mask = select_proposal(img1, img2, mask, max_prop_num, pair_select
 end
 
 % Filter proposals with mask whose overlap ratio is larger than theshold.
-function result = filter_prop_with_mask(mask, props, min_overlap)
+function result = filter_prop_with_mask(mask, props, min_overlap, max_size_ratio)
+    if nargin < 4
+        max_size_ratio = 0.01;
+    end
+    if nargin < 3
+        min_overlap = 0.8;
+    end
+    
     counter = 0;
     prop_num = length(props);
-    mask_size = sum(mask(:));
+    [height, width] = size(mask);
+    img_size = height * width;
+    max_size = img_size * max_size_ratio;
     
     for prop_index = 1:prop_num
         prop = props{prop_index};
-        overlap = sum(prop(:)) / mask_size;
-        if overlap >= min_overlap
+        prop_size = sum(prop(:));
+        overlap = sum(sum(prop & mask)) / prop_size;
+        if overlap >= min_overlap && prop_size <= max_size
             counter = counter + 1;
             result{counter} = prop;
         end
     end
 end
-            
