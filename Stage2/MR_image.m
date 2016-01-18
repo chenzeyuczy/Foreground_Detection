@@ -18,14 +18,14 @@ function saliency_map = MR_image(image, opts, mask)
     %%----------------------design the graph model--------------------------%%
     % compute the feature (mean color in lab color space) 
     % for each node (superpixels)
-    input_vals = reshape(image, height*width, dim);
-    rgb_vals = zeros(sp_num,1,3);
+    input_vals = reshape(image, height * width, dim);
+    rgb_vals = zeros(sp_num, 1, 3);
     inds = cell(sp_num, 1);
     for i = 1:sp_num
-        inds{i} = find(superpixels==i);
-        rgb_vals(i,1,:) = mean(input_vals(inds{i},:),1);
+        inds{i} = find(superpixels == i);
+        rgb_vals(i,1,:) = mean(input_vals(inds{i},:), 1);
     end
-    lab_vals = colorspace('Lab<-', rgb_vals);
+    lab_vals = rgb2lab(rgb_vals);
     seg_vals = reshape(lab_vals, sp_num, 3); % feature for each superpixel
  
     % get edges
@@ -33,28 +33,28 @@ function saliency_map = MR_image(image, opts, mask)
     edges = [];
     for i = 1:sp_num
         indext = [];
-        ind = find(adjloop(i,:)==1);
+        ind = find(adjloop(i,:) == 1);
         for j = 1:length(ind)
-            indj = find(adjloop(ind(j),:)==1);
-            indext = [indext,indj];
+            indj = find(adjloop(ind(j),:) == 1);
+            indext = [indext, indj];
         end
-        indext = [indext,ind];
+        indext = [indext, ind];
         indext = indext((indext>i));
         indext = unique(indext);
         if (~isempty(indext))
-            ed = ones(length(indext),2);
+            ed = ones(length(indext), 2);
             ed(:,2) = i;
             ed(:,1) = indext;
-            edges = [edges;ed];
+            edges = [edges; ed];
         end
     end
 
     % compute affinity matrix
-    weights = makeweights(edges,seg_vals,theta);
-    W = adjacency(edges,weights,sp_num);
+    weights = makeweights(edges, seg_vals, theta);
+    W = adjacency(edges, weights, sp_num);
 
     % learn the optimal affinity matrix (eq. 3 in paper)
-    D = sparse(1:sp_num,1:sp_num,sum(W));
+    D = sparse(1:sp_num, 1:sp_num, sum(W));
     optAff = (D-alpha*W)\eye(sp_num);
     optAff = optAff.*(~diag(ones(sp_num,1)));
   
@@ -66,7 +66,7 @@ function saliency_map = MR_image(image, opts, mask)
     fsal = optAff * query;    
     
     % assign the saliency value to each pixel
-    tmap = zeros(height,width);
+    tmap = zeros(height, width);
     for i = 1:sp_num
         tmap(inds{i}) = fsal(i);    
     end
