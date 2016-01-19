@@ -3,12 +3,13 @@
 video_num = 5;
 
 for video_index = 1:video_num
+    video_name = data_info{video_index}.data_name;
     images = data_info{video_index}.data;
     gts = data_info{video_index}.gt;
     img_num = length(images);
     
     precision1{video_index} = zeros(img_num, 1);
-    recall{video_index} = zeros(img_num, 1);
+    recall1{video_index} = zeros(img_num, 1);
 
     fprintf('Processing video %d...\n', video_index);
     tic();
@@ -24,14 +25,14 @@ for video_index = 1:video_num
         case 5
             init_mask = get_init_mask_5(images);
     end
-    foreground{video_index} = init_mask;
+    init_fg{video_index} = init_mask;
     time1(video_index) = toc();
     fprintf('Process video %d in %s seconds.\n', video_index, time1(video_index));
     avg_time1(video_index) = time1(video_index) / img_num;
     fprintf('%f seconds per frame in stage 1.\n', avg_time1(video_index));
 
     for imgIndex = 1:img_num
-        mask = foreground{video_index}{imgIndex};
+        mask = init_fg{video_index}{imgIndex};
         gt = gts{imgIndex};
 
         % Evaluate performance.
@@ -39,7 +40,7 @@ for video_index = 1:video_num
         fprintf('Image %d in video %d.\n', imgIndex, video_index);
         fprintf('Accuracy: %f, Recall: %f. Error: %f.\n', pcs, rc, err);
         precision1{video_index}(imgIndex) = pcs;
-        recall{video_index}(imgIndex) = rc;
+        recall1{video_index}(imgIndex) = rc;
         error_rate{video_index}(imgIndex) = err;
 
         % Show image.
@@ -61,6 +62,8 @@ for video_index = 1:video_num
     end
     
     % Draw image.
+    pcs = precision1{video_index};
+    rc = recall1{video_index};
     subplot(1, 1, 1);
     hold on;
     plot(pcs, 'Color', 'r', 'LineWidth', 1, 'LineStyle', '-', 'Marker', 'o');
