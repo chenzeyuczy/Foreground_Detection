@@ -1,22 +1,13 @@
 % Script to get initial mask from videos.
 
-clear all;
-import_data;
-
 video_num = 5;
-precision = cell(video_num, 1);
-recall = cell(video_num, 1);
-error_rate = cell(video_num, 1);
-foreground = cell(video_num, 1);
-t = zeros(video_num, 1);
-avg_time = zeros(video_num, 1);
 
-for video_index = 4
+for video_index = 1:video_num
     images = data_info{video_index}.data;
     gts = data_info{video_index}.gt;
     img_num = length(images);
     
-    precision{video_index} = zeros(img_num, 1);
+    precision1{video_index} = zeros(img_num, 1);
     recall{video_index} = zeros(img_num, 1);
 
     fprintf('Processing video %d...\n', video_index);
@@ -34,10 +25,10 @@ for video_index = 4
             init_mask = get_init_mask_5(images);
     end
     foreground{video_index} = init_mask;
-    t(video_index) = toc();
-    fprintf('Process video %d in %s seconds.\n', video_index, t(video_index));
-    avg_time(video_index) = t(video_index) / img_num;
-    fprintf('%f seconds per frame.\n', avg_time(video_index));
+    time1(video_index) = toc();
+    fprintf('Process video %d in %s seconds.\n', video_index, time1(video_index));
+    avg_time1(video_index) = time1(video_index) / img_num;
+    fprintf('%f seconds per frame in stage 1.\n', avg_time1(video_index));
 
     for imgIndex = 1:img_num
         mask = foreground{video_index}{imgIndex};
@@ -47,7 +38,7 @@ for video_index = 4
         [pcs, rc, err] = get_hit_rate(mask, gt);
         fprintf('Image %d in video %d.\n', imgIndex, video_index);
         fprintf('Accuracy: %f, Recall: %f. Error: %f.\n', pcs, rc, err);
-        precision{video_index}(imgIndex) = pcs;
+        precision1{video_index}(imgIndex) = pcs;
         recall{video_index}(imgIndex) = rc;
         error_rate{video_index}(imgIndex) = err;
 
@@ -66,6 +57,23 @@ for video_index = 4
         end
         imwrite(mask, result_path);
 
-%         pause(0.6);
+        pause(0.3);
     end
+    
+    % Draw image.
+    subplot(1, 1, 1);
+    hold on;
+    plot(pcs, 'Color', 'r', 'LineWidth', 1, 'LineStyle', '-', 'Marker', 'o');
+    plot(rc, 'Color', 'g', 'LineWidth', 1, 'LineStyle', '--', 'Marker', '+');
+    axis([0, inf, 0, 1]);
+    set(gcf, 'name', ['Video ' num2str(video_index)], 'numbertitle', 'off');
+    title(video_name);
+    xlabel('Frame Sequence');
+    legend('Precision', 'Recall');
+    hold off;
+    img_path = 'result/stage1/performance/';
+    if exist(img_path) ~= 7
+        mkdir(img_path);
+    end
+    saveas(gcf, [img_path, video_name '.jpg']);
 end

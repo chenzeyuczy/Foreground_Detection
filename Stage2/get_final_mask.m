@@ -2,13 +2,7 @@
 
 video_num = 5;
 
-precision1 = cell(video_num, 1);
-recall1 = cell(video_num, 1);
-precision2 = cell(video_num, 1);
-recall2 = cell(video_num, 1);
-t2 = zeros(video_num, 1);
-
-for video_index = 4
+for video_index = 1:video_num
     video_name = data_info{video_index}.data_name;
     images = data_info{video_index}.data;
     gts = data_info{video_index}.gt;
@@ -20,15 +14,20 @@ for video_index = 4
     rc1 = zeros(img_num, 1);
     rc2 = zeros(img_num, 1);
 
+    tic();
     for img_index = 1:img_num
-        tic();
         img = images{img_index};
         mask = masks{img_index};
         gt = gts{img_index};
         saliency1 = MR_image(img, opts, mask);
         saliency2 = im2bw(saliency1, graythresh(saliency1));
-        t2(video_index) = toc();
-        
+    end
+    time2(video_index) = toc();
+    fprintf('Process video %d in %s seconds.\n', video_index, time2(video_index));
+    avg_time2(video_index) = time2(video_index) / img_num;
+    fprintf('%f seconds per frame in stage 2.\n', avg_time2(video_index));
+    
+    for img_index = 1:img_num
         % Evaluate performance.
         [pcs1(img_index), rc1(img_index), ~] = get_hit_rate(mask, gt);
         [pcs2(img_index), rc2(img_index), ~] = get_hit_rate(saliency2, gt);
@@ -50,7 +49,7 @@ for video_index = 4
         end
         imwrite(saliency2, result_path);
 
-        pause(0.1);
+        pause(0.3);
     end
     
     precision1{video_index} = pcs1;
