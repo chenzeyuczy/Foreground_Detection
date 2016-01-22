@@ -13,34 +13,34 @@ function init_mask = get_init_mask_5(images)
     init_mask = cell(img_num, 1);
     diff_mask = cell(img_num, 1);
     
-    % Get mask for image in range(0, imgIndex).
+    % Get mask for image in range(0, img_index).
     % Start period.
 	detector = vision.ForegroundDetector('NumTrainingFrames', 3, ...
         'NumGaussians', 3, 'LearningRate', learn_rate, 'InitialVariance', 30*30);
-    for imgIndex = 1 : train_num + 1
-        img = images{imgIndex};
-        diff_mask{imgIndex} = step(detector, img);
+    for img_index = 1 : train_num + 1
+        img = images{img_index};
+        diff_mask{img_index} = step(detector, img);
     end
     % Stable period.
     detector = vision.ForegroundDetector('NumTrainingFrames', train_num ,...
             'NumGaussians', 5, 'LearningRate', learn_rate, 'InitialVariance', 30*30);
-    for imgIndex = train_num + 2: img_num
-        img = images{imgIndex};
-        for temIndex = imgIndex - train_num - 1: imgIndex - 1
+    for img_index = train_num + 2: img_num
+        img = images{img_index};
+        for temIndex = img_index - train_num - 1: img_index - 1
             fg_tmp = step(detector, images{temIndex});
         end
-        diff_mask{imgIndex} = step(detector, img);
+        diff_mask{img_index} = step(detector, img);
         reset(detector);
     end
     % Morphology process.
     m0 = [1, 0, 1; 1, 0, 1; 1, 0, 1];
     m1 = [0, 1, 0; 1, 0, 1; 0, 1, 0];
     m2 = [0, 1, 0; 1, 1, 1; 0, 1, 0];
-    for imgIndex = 1:img_num     
-        diff = diff_mask{imgIndex};
+    for img_index = 1:img_num     
+        diff = diff_mask{img_index};
         diff = imerode(diff, m0) | imerode(diff, m1);
         diff = imdilate(diff, m2);
-        diff_mask{imgIndex} = diff;
+        diff_mask{img_index} = diff;
     end
     
     % Choose good proposal.
@@ -50,10 +50,10 @@ function init_mask = get_init_mask_5(images)
     min_mask_ratio1 = 0.005;
     min_mask_ratio2 = 0.010;
     min_mask_ratio3 = 0.015;
-    for imgIndex = 1:img_num
-        img = images{imgIndex};
+    for img_index = 1:img_num
+        img = images{img_index};
         [height, width, ~] = size(img);
-        init_mask{imgIndex} = false(height, width);
+        init_mask{img_index} = false(height, width);
         img_size = height * width;
         [props, boxes] = get_proposals(img);
         
@@ -64,28 +64,19 @@ function init_mask = get_init_mask_5(images)
             if prop_size / img_size > max_prop_ratio
                 continue
             end
-            diff_ratio = sum(sum(diff_mask{imgIndex} & props{propIndex})) / prop_size;
+            diff_ratio = sum(sum(diff_mask{img_index} & props{propIndex})) / prop_size;
             if diff_ratio < min_diff_ratio
                 continue
             end
-            init_mask{imgIndex} = init_mask{imgIndex} | p;
+            init_mask{img_index} = init_mask{img_index} | p;
         end
-%         subplot(1, 3, 1);
-%         imshow(diff_mask{imgIndex});
-        mask_ratio = sum(sum(init_mask{imgIndex})) / img_size;
-%         fprintf('Mask ratio for image %d: %f\n', imgIndex, mask_ratio);
-%         subplot(1, 3, 2);
-%         imshow(init_mask{imgIndex});
+        mask_ratio = sum(sum(init_mask{img_index})) / img_size;
         if mask_ratio < min_mask_ratio1
-            init_mask{imgIndex} = fill_fg_with_prop(init_mask{imgIndex}, props, 4);
+            init_mask{img_index} = fill_fg_with_prop(init_mask{img_index}, props, 4);
         elseif mask_ratio < min_mask_ratio2
-            init_mask{imgIndex} = fill_fg_with_prop(init_mask{imgIndex}, props, 3);
+            init_mask{img_index} = fill_fg_with_prop(init_mask{img_index}, props, 3);
         elseif mask_ratio < min_mask_ratio3
-            init_mask{imgIndex} = fill_fg_with_prop(init_mask{imgIndex}, props, 2);
+            init_mask{img_index} = fill_fg_with_prop(init_mask{img_index}, props, 2);
         end
-%         subplot(1, 3, 3);
-%         imshow(init_mask{imgIndex});
-%         set(gcf, 'name', ['Image ' num2str(imgIndex)], 'numbertitle', 'off');
-%         pause(0.1);
     end
 end

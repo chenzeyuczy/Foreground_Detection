@@ -31,9 +31,17 @@ opts.show_sp_map = 0;
 
 % Declare variables.
 video_num = 5;
-precision = cell(video_num, 1);
-recall = cell(video_num, 1);
-error_rate = cell(video_num, 1);
+
+proposals = length(video_num, 1);
+boxes = length(video_num, 1);
+
+precision1 = cell(video_num, 1);
+recall1 = cell(video_num, 1);
+error_pixel1 = cell(video_num, 1);
+precision2 = cell(video_num, 1);
+recall2 = cell(video_num, 1);
+error_pixel2 = cell(video_num, 1);
+
 init_fg = cell(video_num, 1);
 final_fg = cell(video_num, 1);
 time1 = zeros(video_num, 1);

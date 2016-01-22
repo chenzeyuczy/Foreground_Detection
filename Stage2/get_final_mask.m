@@ -15,6 +15,8 @@ for video_index = 1:video_num
     pcs2 = zeros(img_num, 1);
     rc1 = zeros(img_num, 1);
     rc2 = zeros(img_num, 1);
+    err1 = zeros(img_num, 1);
+    err2 = zeros(img_num, 1);
 
     tic();
     for img_index = 1:img_num
@@ -35,8 +37,8 @@ for video_index = 1:video_num
         init_mask = masks{img_index};
         gt = gts{img_index};
         final_mask = saliency2{img_index};
-        [pcs1(img_index), rc1(img_index), ~] = get_hit_rate(init_mask, gt);
-        [pcs2(img_index), rc2(img_index), ~] = get_hit_rate(final_mask, gt);
+        [pcs1(img_index), rc1(img_index), err1(img_index)] = get_hit_rate(init_mask, gt);
+        [pcs2(img_index), rc2(img_index), err2(img_index)] = get_hit_rate(final_mask, gt);
 
         % Show image.
         subplot(2, 2, 1);
@@ -50,6 +52,12 @@ for video_index = 1:video_num
         set(gcf, 'name', ['Image ' num2str(imgIndex)], 'numbertitle', 'off');
 
         % Save result.
+        result_folder = [pwd '/result/stage2_1/' num2str(video_index)];
+        result_path = [result_folder '/' num2str(img_index) '.png'];
+        if exist(result_folder) ~= 7
+            mkdir(result_folder);
+        end
+        imwrite(saliency1{img_index}, result_path);
         result_folder = [pwd '/result/stage2/' num2str(video_index)];
         result_path = [result_folder '/' num2str(img_index) '.png'];
         if exist(result_folder) ~= 7
@@ -64,6 +72,8 @@ for video_index = 1:video_num
     recall1{video_index} = rc1;
     precision2{video_index} = pcs2;
     recall2{video_index} = rc2;
+    error_pixel1{video_index} = err1;
+    error_pixel2{video_index} = err2;
 
     % Draw image.
     subplot(1, 1, 1);

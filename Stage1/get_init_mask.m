@@ -2,7 +2,7 @@
 
 video_num = 5;
 
-for video_index = 1:video_num
+for video_index = 1:video_index
     video_name = data_info{video_index}.data_name;
     images = data_info{video_index}.data;
     gts = data_info{video_index}.gt;
@@ -10,8 +10,17 @@ for video_index = 1:video_num
     
     precision1{video_index} = zeros(img_num, 1);
     recall1{video_index} = zeros(img_num, 1);
+    error_pixel1{video_index} = zeros(img_num, 1);
 
     fprintf('Processing video %d...\n', video_index);
+     
+%     proposals{video_index} = cell(img_num, 1);
+%     boxes{video_index} = cell(img_num, 1);
+%     for img_index = 1:img_num
+%         img = images{img_index};
+%         [proposals{video_index}{img_index}, boxes{video_index}{img_index}] = get_proposal(img);
+%     end
+    
     tic();
     switch video_index
         case 1
@@ -41,7 +50,7 @@ for video_index = 1:video_num
         fprintf('Accuracy: %f, Recall: %f. Error: %f.\n', pcs, rc, err);
         precision1{video_index}(imgIndex) = pcs;
         recall1{video_index}(imgIndex) = rc;
-        error_rate{video_index}(imgIndex) = err;
+        error_pixel1{video_index}(imgIndex) = err;
 
         % Show image.
         subplot(1, 2, 1);

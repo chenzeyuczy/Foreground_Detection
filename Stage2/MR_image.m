@@ -10,6 +10,7 @@ function saliency_map = MR_image(image, opts, mask)
     theta = 10; % control the edge weight 
     alpha = 0.99; % control the balance of two items in manifold ranking cost function
     [height, width, dim] = size(image);
+    img_size = height * width;
 
     %%----------------------generate superpixels--------------------%%
     superpixels = process_sp_map(gen_sp(image, opts));
@@ -63,16 +64,34 @@ function saliency_map = MR_image(image, opts, mask)
     query = score_superpixel(superpixels, mask);
     
     % compute the saliency value for each superpixel
-    fsal = optAff * query;    
+    fsal = optAff * query;
     
     % assign the saliency value to each pixel
     tmap = zeros(height, width);
     for i = 1:sp_num
-        tmap(inds{i}) = fsal(i);    
+        tmap(inds{i}) = fsal(i);
     end
     % normalize saliency map
     tmap = (tmap-min(tmap(:)))/(max(tmap(:))-min(tmap(:)));
 
     saliency_map = tmap;
-    
+%     
+%     fg_map = im2bw(saliency_map, graythresh(saliency_map));
+%     fg_size = sum(fg_map(:));
+%     
+%     max_fg_ratio = 0.15;
+%     if fg_size / img_size > max_fg_ratio
+%         bg_query = 1 - fsal;
+%         bsal = optAff * bg_query;
+%         fsal = 1 - bsal;
+%         % assign the saliency value to each pixel
+%         tmap = zeros(height, width);
+%         for i = 1:sp_num
+%             tmap(inds{i}) = fsal(i);    
+%         end
+%         % normalize saliency map
+%         tmap = (tmap-min(tmap(:)))/(max(tmap(:))-min(tmap(:)));
+% 
+%         saliency_map = tmap;     
+%     end
 end

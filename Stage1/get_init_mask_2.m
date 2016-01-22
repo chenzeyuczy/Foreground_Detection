@@ -14,19 +14,19 @@ function init_mask = get_init_mask_2(images)
     % Get mask for image in range(0, imgIndex).
 	detector = vision.ForegroundDetector('NumTrainingFrames', train_num, ...
         'NumGaussians', 3, 'LearningRate', learn_rate, 'InitialVariance', 30*30);
-    for imgIndex = 1 : train_num + 1
-        img = images{imgIndex};
-        diff_mask{imgIndex} = step(detector, img);
+    for img_index = 1 : train_num + 1
+        img = images{img_index};
+        diff_mask{img_index} = step(detector, img);
     end
     
     detector = vision.ForegroundDetector('NumTrainingFrames', train_num ,...
             'NumGaussians', 5, 'LearningRate', 0.005, 'InitialVariance', 30*30);
-    for imgIndex = train_num + 2: img_num
-        img = images{imgIndex};
-        for temIndex = imgIndex - train_num - 1: imgIndex - 1
+    for img_index = train_num + 2: img_num
+        img = images{img_index};
+        for temIndex = img_index - train_num - 1: img_index - 1
             fg_tmp = step(detector, images{temIndex});
         end
-        diff_mask{imgIndex} = step(detector, img);
+        diff_mask{img_index} = step(detector, img);
         reset(detector);
     end
     
@@ -34,10 +34,10 @@ function init_mask = get_init_mask_2(images)
     max_prop_ratio = 0.013;
     min_diff_ratio = 0.25;
     init_mask = cell(img_num, 1);
-    for imgIndex = 1:img_num
-        img = images{imgIndex};
+    for img_index = 1:img_num
+        img = images{img_index};
         [height, width, ~] = size(img);
-        init_mask{imgIndex} = false(height, width);
+        init_mask{img_index} = false(height, width);
         img_size = height * width;
         [props, boxes] = get_proposals(img);
         
@@ -48,15 +48,12 @@ function init_mask = get_init_mask_2(images)
             if prop_size / img_size > max_prop_ratio
                 continue
             end
-            diff_ratio = sum(sum(diff_mask{imgIndex} & props{propIndex})) / prop_size;
+            diff_ratio = sum(sum(diff_mask{img_index} & props{propIndex})) / prop_size;
             if diff_ratio < min_diff_ratio
                 continue
             end
-            init_mask{imgIndex} = init_mask{imgIndex} | p;
+            init_mask{img_index} = init_mask{img_index} | p;
         end
-        init_mask{imgIndex} = fill_fg_with_prop(init_mask{imgIndex}, props, 1);
-%         imshow(init_mask{imgIndex});
-%         title(num2str(imgIndex));
-%         pause(0.1);
+        init_mask{img_index} = fill_fg_with_prop(init_mask{img_index}, props, 1);
     end
 end
