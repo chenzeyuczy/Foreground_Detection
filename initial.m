@@ -32,8 +32,8 @@ opts.show_sp_map = 0;
 % Declare variables.
 video_num = 5;
 
-proposals = length(video_num, 1);
-boxes = length(video_num, 1);
+proposals = cell(video_num, 1);
+boxes = cell(video_num, 1);
 
 precision1 = cell(video_num, 1);
 recall1 = cell(video_num, 1);

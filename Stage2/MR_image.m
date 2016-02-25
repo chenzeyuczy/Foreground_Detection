@@ -79,7 +79,7 @@ function saliency_map = MR_image(image, opts, mask)
 %     fg_map = im2bw(saliency_map, graythresh(saliency_map));
 %     fg_size = sum(fg_map(:));
 %     
-%     max_fg_ratio = 0.15;
+%     max_fg_ratio = 0.10;
 %     if fg_size / img_size > max_fg_ratio
 %         bg_query = 1 - fsal;
 %         bsal = optAff * bg_query;
@@ -92,6 +92,6 @@ function saliency_map = MR_image(image, opts, mask)
 %         % normalize saliency map
 %         tmap = (tmap-min(tmap(:)))/(max(tmap(:))-min(tmap(:)));
 % 
-%         saliency_map = tmap;     
+%         saliency_map = tmap;
 %     end
 end

@@ -2,7 +2,7 @@
 
 video_num = 5;
 
-for video_index = 1:video_index
+for video_index = 1:video_num
     video_name = data_info{video_index}.data_name;
     images = data_info{video_index}.data;
     gts = data_info{video_index}.gt;

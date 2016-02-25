@@ -1,8 +1,8 @@
 % Calculate error pixels per frame in each vidoe.
 video_num = 5;
 
-err_perframe1 = zeros(video_num, 1);
-err_perframe2 = zeros(video_num, 1);
+err_per_frame1 = zeros(video_num, 1);
+err_per_frame2 = zeros(video_num, 1);
 
 for video_index = 1:video_num
     img_num = length(data_info{video_index}.data);
