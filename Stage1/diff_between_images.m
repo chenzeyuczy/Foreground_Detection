@@ -13,10 +13,6 @@ function diff = diff_between_images(img1, img2, thld)
     img2 = rgb2gray(im2double(img2));
     diff = abs(img2 - img1);
     diff = im2uint8(diff);
-%     max_val = max(diff(:));
-%     min_val = min(diff(:));
-%     mean_val = mean(diff(:));
-%     fprintf('Max: %d; Min: %d; Mean: %d.\n', max_val, min_val, mean_val);
     if nargin > 2
         thld = prctile(diff(:), thld * 100);
 %         fprintf('Threshold: %d\n', thld);

@@ -2,7 +2,7 @@
 % if the bg changes fast, then use a small numTrain and large learning rate, to make the bg update fast; or vice versa.
 
 function detectGMM()
-	iDataset = 3;
+	iDataset = 1;
 	switch iDataset
 		case 1
 			numTrain = 5; learnRate = 0.005;

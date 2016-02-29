@@ -49,7 +49,7 @@ for video_index = 1:video_num
         imshow(saliency1{img_index});
         subplot(2, 2, 4);
         imshow(saliency2{img_index});
-        set(gcf, 'name', ['Image ' num2str(imgIndex)], 'numbertitle', 'off');
+        set(gcf, 'name', ['Image ' num2str(img_index)], 'numbertitle', 'off');
 
         % Save result.
         result_folder = [pwd '/result/stage2_1/' num2str(video_index)];

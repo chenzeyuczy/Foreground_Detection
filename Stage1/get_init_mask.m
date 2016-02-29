@@ -40,28 +40,28 @@ for video_index = 1:video_num
     avg_time1(video_index) = time1(video_index) / img_num;
     fprintf('%f seconds per frame in stage 1.\n', avg_time1(video_index));
 
-    for imgIndex = 1:img_num
-        mask = init_fg{video_index}{imgIndex};
-        gt = gts{imgIndex};
+    for img_index = 1:img_num
+        mask = init_fg{video_index}{img_index};
+        gt = gts{img_index};
 
         % Evaluate performance.
         [pcs, rc, err] = get_hit_rate(mask, gt);
-        fprintf('Image %d in video %d.\n', imgIndex, video_index);
+        fprintf('Image %d in video %d.\n', img_index, video_index);
         fprintf('Accuracy: %f, Recall: %f. Error: %f.\n', pcs, rc, err);
-        precision1{video_index}(imgIndex) = pcs;
-        recall1{video_index}(imgIndex) = rc;
-        error_pixel1{video_index}(imgIndex) = err;
+        precision1{video_index}(img_index) = pcs;
+        recall1{video_index}(img_index) = rc;
+        error_pixel1{video_index}(img_index) = err;
 
         % Show image.
         subplot(1, 2, 1);
         imshow(mask);
         subplot(1, 2, 2);
         imshow(gt);
-        set(gcf, 'name', ['Image ' num2str(imgIndex)], 'numbertitle', 'off');
+        set(gcf, 'name', ['Image ' num2str(img_index)], 'numbertitle', 'off');
 
         % Save result.
         result_folder = [pwd '/result/stage1/' num2str(video_index)];
-        result_path = [result_folder '/' num2str(imgIndex) '.png'];
+        result_path = [result_folder '/' num2str(img_index) '.png'];
         if exist(result_folder) ~= 7
             mkdir(result_folder);
         end
